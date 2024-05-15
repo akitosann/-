@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>名簿検索</title>
+</head>
+<body>
+  <h1>名簿検索</h1>
+  <form id="searchForm">
+    所属学校: <input type="text" id="school"><br>
+    年: <input type="text" id="year"><br>
+    組: <input type="text" id="class"><br>
+    名前: <input type="text" id="name"><br>
+    フリガナ: <input type="text" id="kana"><br>
+    <input type="submit" value="検索">
+  </form>
+  <h2>検索結果</h2>
+  <div id="results"></div>
+
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const school = document.getElementById('school').value;
+      const year = document.getElementById('year').value;
+      const class_ = document.getElementById('class').value;
+      const name = document.getElementById('name').value;
+      const kana = document.getElementById('kana').value;
+
+      fetch('students.csv')
+        .then(response => response.text())
+        .then(text => {
+          const rows = text.split('\n').slice(1);
+          let results = rows.map(row => row.split(','));
+
+          if (school) results = results.filter(row => row[0] === school);
+          if (year) results = results.filter(row => row[1] === year);
+          if (class_) results = results.filter(row => row[2] === class_);
+          if (name) results = results.filter(row => row[3].includes(name));
+          if (kana) results = results.filter(row => row[4].includes(kana));
+
+          document.getElementById('results').innerHTML = '<ul>' + results.map(row => `<li>${row.join(', ')}</li>`).join('') + '</ul>';
+        });
+    });
+  </script>
+</body>
+</html>
